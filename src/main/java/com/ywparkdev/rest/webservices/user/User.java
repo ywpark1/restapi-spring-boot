@@ -2,18 +2,32 @@ package com.ywparkdev.rest.webservices.user;
 
 import com.ywparkdev.rest.webservices.post.Post;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class User {
 
+    @Id
+    @GeneratedValue
     private Integer id;
+
+    @Size(min = 2, message = "Name should be at least 2 characters!")
     private String name;
+
+    @Past()
     private Date birthDate;
+
     private List<Post> posts = new ArrayList<>();
 
-    protected User() {}
+    protected User() {
+    }
 
     public User(Integer id, String name, Date birthDate) {
         this.id = id;
@@ -63,7 +77,7 @@ public class User {
     }
 
     public Post add(Post post) {
-        if(post.getId() == null) {
+        if (post.getId() == null) {
             post.setId(posts.size() + 1);
         }
 
