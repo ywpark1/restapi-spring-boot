@@ -38,12 +38,12 @@ public class UserDaoService {
         return null;
     }
 
-    public Post saveUserPost(User user, Post post) {
-        if(post.getTitle() == null || post.getContent() == null) {
-            return null;
-        }
-        return user.add(post);
-    }
+//    public Post saveUserPost(User user, Post post) {
+//        if(post.getTitle() == null || post.getContent() == null) {
+//            return null;
+//        }
+//        return user.add(post);
+//    }
 
     public User deleteById(int id) {
         Iterator<User> iterator = users.iterator();
