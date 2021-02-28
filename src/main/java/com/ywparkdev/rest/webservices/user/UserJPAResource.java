@@ -1,5 +1,7 @@
 package com.ywparkdev.rest.webservices.user;
 
+import com.ywparkdev.rest.webservices.post.Post;
+import com.ywparkdev.rest.webservices.post.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -19,10 +21,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserJPAResource {
 
     @Autowired
-    private UserDaoService service;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private PostRepository postRepository;
 
     @GetMapping("/jpa/users")
     public List<User> retrieveAllUsers() {
@@ -67,12 +69,16 @@ public class UserJPAResource {
         userRepository.deleteById(id);
     }
 
-//    @GetMapping("/users/{id}/posts")
-//    public List<Post> retrieveUserAllPosts(@PathVariable int id) {
-//        EntityModel<User> user = retrieveUserById(id);
-//
-//        return user.getPosts();
-//    }
+    @GetMapping("/jpa/users/{id}/posts")
+    public List<Post> retrieveUserAllPosts(@PathVariable int id) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if(!userOptional.isPresent()) {
+            throw new UserNotFoundException("id-" + id);
+        }
+
+        return userOptional.get().getPosts();
+    }
 //
 //    @GetMapping("/users/{id}/posts/{postId}")
 //    public Post retrieveUserPostById(@PathVariable int id, @PathVariable int postId) {
@@ -89,27 +95,24 @@ public class UserJPAResource {
 //        throw new PostNotFoundException("postId-" + postId);
 //    }
 //
-//    @PostMapping("/users/{id}/posts")
-//    public ResponseEntity<Object> createUserPost(@PathVariable int id, @RequestBody Post post) {
-//        User user = retrieveUserById(id);
-//
-//        if(user == null) {
-//            throw new UserNotFoundException("id-" + id);
-//        }
-//
-//        Post savedPost = service.saveUserPost(user, post);
-//
-//        if(savedPost == null) {
-//            throw new PostMissingFieldException("Post required fields are missing");
-//        }
-//
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(savedPost.getId()).toUri();
-//
-//        return ResponseEntity.created(location).build();
-//    }
+    @PostMapping("/jpa/users/{id}/posts")
+    public ResponseEntity<Object> createUserPost(@PathVariable int id, @RequestBody Post post) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if(!userOptional.isPresent()) {
+            throw new UserNotFoundException("id-" + id);
+        }
+
+        post.setUser(userOptional.get());
+        Post newPost = postRepository.save(post);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newPost.getId()).toUri();
+
+        return ResponseEntity.created(location).build();
+    }
 
 
 }

@@ -27,7 +27,8 @@ public class User {
     @ApiModelProperty(notes = "Birth date should be in the past")
     private Date birthDate;
 
-//    private List<Post> posts = new ArrayList<>();
+   @OneToMany(mappedBy = "user") // name of the field in Post
+    private List<Post> posts;
 
     protected User() {
     }
@@ -62,6 +63,14 @@ public class User {
         this.birthDate = birthDate;
     }
 
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -71,13 +80,7 @@ public class User {
                 '}';
     }
 
-//    public List<Post> getPosts() {
-//        return posts;
-//    }
-//
-//    public void setPosts(List<Post> posts) {
-//        this.posts = posts;
-//    }
+
 //
 //    public Post add(Post post) {
 //        if (post.getId() == null) {
